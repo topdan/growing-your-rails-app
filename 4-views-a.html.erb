@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <%= csrf_meta_tag %>
+
+  <title><%= application_title %></title>
+
+  <%= stylesheet_link_tag 'application' %>
+  <%= javascript_include_tag 'application' %>
+</head>
+<body>
+  <%= application_topnav %>
+  <%= application_sidenav %>
+
+  <div class="container">
+    <%= application_screen_options %>
+    <%= application_help %>
+
+    <%= yield %>
+
+    <%= application_footer %>
+  </div>
+</body>
+</html>
