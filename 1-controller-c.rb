@@ -20,7 +20,7 @@ class SessionsController < ApplicationController
 
     else
       login(@signin.user)
-      redirect_to root_path, notice: t('sessions.create.success')
+      redirect_to dashboard_path, notice: t('sessions.create.success')
     end
   end
 

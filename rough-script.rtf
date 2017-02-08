@@ -5,35 +5,37 @@
 \margl1440\margr1440\vieww10800\viewh13700\viewkind0
 \pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
 
-\f0\fs24 \cf0 Hello, my name is Dan Cunning. A little background info: I\'92ve been Rails contractor since 2008, mostly with clients around the Atlanta area under my company Cunning Simplicity Inc.\
+\f0\fs24 \cf0 Hello, my name is Dan Cunning. I\'92ve been Rails contractor for roughly ten years under my company Cunning Simplicity Inc.\
 \
-That \'85 picture is my profile picture on various websites including my own at topdan.com which has a hodge-podge of things I\'92m interested in \'85 sports,  movies, TV shows, \'85. and programming that thing that brings us here\
+That picture represents me in various places including topdan.com which has a hodge-podge of things I\'92m interested in \'85 sports,  movies, TV shows, \'85. and programming which brings me here\
 \
-I\'92ve been attending the past couple months thinking what I could share that would help new to seasoned Ruby developers and came up with that title \'93Growing Your Rails App\'94\
-\
-:switch slide:\
-\
-Growing may sound strange. \'93Building\'94 is more common, but what happens once you\'92re doing building? Software isn\'92t really ever \'93finished\'94, they grow over years. And over the years I\'92ve created some of that, some of that, a lot stuff somewhere in the middle.\
-\
-One of the biggest benefits of Rails, is providing a structure for your app.  A framework \'85 an architecture  \
+I\'92ve been coming to ATLRUG the past couple months thinking what I could share that would help new to seasoned Ruby developers and came up with that title \'93Growing Your Rails App\'94\
 \
 :switch slide:\
 \
-At the top and bottom are the request and the response. The basis of every server-side web framework \'85 well until web sockets, but that\'92s another story \'85 The basis of Rails\'92 architecture are the model, view and controller. It\'92s not exactly the MVC you learn about in college, but it\'92s a great way of turning a request into a response.\
+Growing may sound strange. \'93Building\'94 is more common, but what happens once you\'92re doing building? Software isn\'92t really ever \'93finished\'94, it grows over years. And over the years I\'92ve created some of that, some of that, a lot stuff somewhere in the middle.\
 \
-I\'92m going to discuss tips for some of these boxes with along with some code examples. These are tips, but rules in stone for everyone. If you have another way of avoiding making a mess in a particular area, great. I\'92m hoping you\'92ll find a suggestion worth thinking about. If you have a question about an approach, feel free to speak up \'85 \
+One of the biggest benefits of Ruby on Rails, is providing a structure for your app.  A framework \'85 an architecture  \
 \
 :switch slide:\
 \
-Controller Tip #1: stick to the standard actions. It\'92s easy to think \'93I\'92ll just add this short action here, no need for another controller\'94 and pretty soon that controller is a few hundred lines long.\
+At the top and bottom are the request and the response. In between is Rails\'92 model, view, and controller. It\'92s not exactly the MVC architecture you study in college, but it\'92s a great way of turning a request into a response.\
+\
+Today, I\'92m going to give tips for each box with along with some code examples. These are just tips, not rules in stone that I think everyone should follow. If you have another way of avoiding making a mess in a particular area, great. I\'92m hoping you\'92ll find a few tips worth thinking about. If you have a question about an approach, feel free to speak up \'85 \
+\
+:switch slide:\
+\
+Controller Tip #1: stick to the standard actions. It\'92s easy to think \'93I\'92ll just add this extra one, it\'92s small, no need for another controller\'94 and you wake up one day and your controller is a few hundred lines long.\
 \
 The broken window theory is real. Once you break one window, you or someone else is more likely to break another, but in a more abstract sense. You should be create RESTful resources\
 \
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
+\cf0 Instead of throwing a bunch of new verbs at your controllers, rethink your controllers as only creating, showing, updating, and destroying things.\
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
+\cf0 \
 :code controller-a:\
 \
 POST maps to CREATE.  PUT/PATCH map to UPDATE. and DELETE maps to DESTROY.  Below are some real life examples.  An action \'93reset_password\'94 on the \'93users\'94 controller could easily be replaced by creating a \'93password reset\'94. Copying a post could be creating a copy of a post. Reordering widgets is updating the widget order.\
-\
-Instead of throwing a bunch of verbs at your controllers, rethink your controllers as creating, updating, and destroying things and you\'92re most of the way to a RESTful application.\
 \
 :switch slide:\
 \
@@ -61,7 +63,7 @@ Model tip #2 is an extension of tip #1. Only use nouns, avoids verbs. Your datab
 \
 :code model:\
 \
-Here\'92s an example user model.  First, notice how everything is organized. Every model in application should be organized the same way: I prefer, modules, enums, relationships, validations, callbacks, scopes, methods, with the database schema at the bottom.\
+Here\'92s an example user model.  First, notice how everything is organized. I prefer, modules, enums, relationships, validations, callbacks, scopes, methods, with the database schema at the bottom.\
 \
 Everything is alphabetical, and all the models\'92 scopes are in one place .. not spread across a bunch of modules.  Multiline scopes call an external function and complicated properties use jobs to handle the dirty work.\
 \
@@ -75,7 +77,7 @@ And better yet, you get to say how it should run: now or in the background proce
 \
 Job tip #2. Break jobs into smaller jobs. 1,000 emails will send quicker if you send 10 at a time, but it also makes support easier.\
 \
-What happens if a 10-minute job is running when you restart sidekick?  \'85. sidekiq waits for a little while, but eventually kills it, and it has to start all over again. Exceptions have the same problem, any problem and they start over.\
+What happens if a 5-minute job is running when you restart sidekick?  \'85. sidekiq waits for a little while, but eventually kills it, and it has to start all over again. Exceptions have the same problem, any problem and they start over.\
 \
 :switch slide:\
 \
@@ -97,6 +99,8 @@ It\'92s a single line in your ApplicationMailer and you\'92re set.\
 \
 View tip #1. Avoid most logic. Views should be really easy to follow and most logic just distracts from the HTML. Simple loops and if-statements are really all you need, everything else can get pulled into helpers.\
 \
+Views become a mess when there is too much going on inside them.\
+\
 :switch slide:\
 \
 View tip #2. Break them into visual pieces. This isn\'92t Ruby, but I figure most are familiar with WordPress, and here I\'92ve broken a full page into its components. Topnav, sidebar, footer, screen options, help, recent activity, product news.\
@@ -111,7 +115,7 @@ Here\'92s a sample layout. The actual WordPress HTML is more complicated, but yo
 \
 :code views-b: \
 \
-The action view does the same thing.  It defines out the header and the two widgets together. It relies on helpers to fill in the details of each piece\
+The action view does the same thing.  It defines out the header and the two widgets together. It relies on helpers to fill in the details of each piece.\
 \
 :switch slide:\
 \
@@ -137,12 +141,12 @@ Phew, with all that said, here\'92s the final application architecture of one of
 \
 Here\'92s my final suggestion. Rails doesn\'92t give you everything you need for an application to stay pretty as it grows over the years. Think about your Rails architecture.  Set its convention.  And never compromise.\
 \
-You may change your convention, but never compromise. I\'92ve seen the broken window theory in action too many times.\
+You can go back and change your convention, but never compromise. I\'92ve seen the broken window theory in action too many times.\
 \
 :switch slide:\
 \
 \pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
-\cf0 A mess breeds more mess, so keep your project feeling clean at every step. Think about the banzai tree and how much care it takes to keep it looking beautiful as it grows and put the same effort into your application.\
+\cf0 A mess breeds more mess, so keep your project feeling clean every step along the way. Think about the banzai tree and how much care it takes to keep it looking beautiful as it grows and put the same effort into your application.\
 \
 Thank you.\
 \
