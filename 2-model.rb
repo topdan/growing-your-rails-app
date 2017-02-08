@@ -12,15 +12,15 @@ class User < ActiveRecord::Base
   belongs_to :account
 
   with_options dependent: :destroy do |m|
-    m.has_many :invitations
-    m.has_many :locks
-    m.has_many :password_resets
-    m.has_many :memberships
+    m.has_many :invitations,     class_name: 'Users::Invitations'
+    m.has_many :locks,           class_name: 'Users::Lock'
+    m.has_many :password_resets, class_name: 'Users::PasswordReset'
+    m.has_many :memberships,     class_name: 'Team::Membership'
     m.has_many :orders
   end
 
   has_many :teams, through: :memberships
-  has_one :latest_lock, class_name: 'Lock'
+  has_one :latest_lock, -> { order(created_at: :desc) }, class_name: 'Lock'
 
   validates_presence_of :email
   validates_presence_of :role
@@ -48,8 +48,12 @@ class User < ActiveRecord::Base
     end
   end
 
-  def last_locked_out_at
-    latest_lock.created_at if latest_lock
+  def locked_out?
+    latest_lock && latest_lock.expires_at > Time.now
+  end
+
+  def locked_out_until
+    latest_lock.expires_at if locked_out?
   end
 
 end

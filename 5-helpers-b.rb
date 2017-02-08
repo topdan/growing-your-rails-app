@@ -16,10 +16,6 @@ class Dashboards::RecentActivity < ApplicationViewComponent
     box(id: id, title: title, content: content)
   end
 
-  def refresh
-    %($('##{id}').html("#{j render}");)
-  end
-
   private
 
   def content

@@ -1,0 +1,168 @@
+{\rtf1\ansi\ansicpg1252\cocoartf1504\cocoasubrtf810
+{\fonttbl\f0\fswiss\fcharset0 Helvetica;}
+{\colortbl;\red255\green255\blue255;}
+{\*\expandedcolortbl;;}
+\margl1440\margr1440\vieww10800\viewh13700\viewkind0
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
+
+\f0\fs24 \cf0 Hello, my name is Dan Cunning. A little background info: I\'92ve been Rails contractor since 2008, mostly with clients around the Atlanta area under my company Cunning Simplicity Inc.\
+\
+That \'85 picture is my profile picture on various websites including my own at topdan.com which has a hodge-podge of things I\'92m interested in \'85 sports,  movies, TV shows, \'85. and programming that thing that brings us here\
+\
+I\'92ve been attending the past couple months thinking what I could share that would help new to seasoned Ruby developers and came up with that title \'93Growing Your Rails App\'94\
+\
+:switch slide:\
+\
+Growing may sound strange. \'93Building\'94 is more common, but what happens once you\'92re doing building? Software isn\'92t really ever \'93finished\'94, they grow over years. And over the years I\'92ve created some of that, some of that, a lot stuff somewhere in the middle.\
+\
+One of the biggest benefits of Rails, is providing a structure for your app.  A framework \'85 an architecture  \
+\
+:switch slide:\
+\
+At the top and bottom are the request and the response. The basis of every server-side web framework \'85 well until web sockets, but that\'92s another story \'85 The basis of Rails\'92 architecture are the model, view and controller. It\'92s not exactly the MVC you learn about in college, but it\'92s a great way of turning a request into a response.\
+\
+I\'92m going to discuss tips for some of these boxes with along with some code examples. These are tips, but rules in stone for everyone. If you have another way of avoiding making a mess in a particular area, great. I\'92m hoping you\'92ll find a suggestion worth thinking about. If you have a question about an approach, feel free to speak up \'85 \
+\
+:switch slide:\
+\
+Controller Tip #1: stick to the standard actions. It\'92s easy to think \'93I\'92ll just add this short action here, no need for another controller\'94 and pretty soon that controller is a few hundred lines long.\
+\
+The broken window theory is real. Once you break one window, you or someone else is more likely to break another, but in a more abstract sense. You should be create RESTful resources\
+\
+:code controller-a:\
+\
+POST maps to CREATE.  PUT/PATCH map to UPDATE. and DELETE maps to DESTROY.  Below are some real life examples.  An action \'93reset_password\'94 on the \'93users\'94 controller could easily be replaced by creating a \'93password reset\'94. Copying a post could be creating a copy of a post. Reordering widgets is updating the widget order.\
+\
+Instead of throwing a bunch of verbs at your controllers, rethink your controllers as creating, updating, and destroying things and you\'92re most of the way to a RESTful application.\
+\
+:switch slide:\
+\
+Controller tip #2. Pull logic into services. Controllers should be simple: request in, response out. In most cases simpler translates to more secure. And services help you simplify\
+\
+:code controller-b:\
+\
+Here\'92s a basic create action. It\'92s simple enough, throwing a service into the mix would just complicate it, but when a controller\'92s response is more complicated, a service object can help. \
+\
+:code controller-c:\
+\
+Signing a user in can get complicated and most of the details don\'92t pertain to the response so we pull them out of the controller into a service object. Pass a username and password in, then ask some questions. Are the credentials invalid? Is that user locked out? Do they need to set their password? Or do we just let them in?\
+\
+Controllers shouldn\'92t be more complicated than if-statements for a bunch of different responses.\
+\
+:switch slide:\
+\
+Model tip #1. Treat models like API documentation for your database. Remember when I said Rails MVC is different than your college\'92s MVC? This is the biggest example. ActiveRecord is just a great way to access your database.\
+\
+Before adding any code to your model, imagine asking whether your database should know how to do that. Removing everything else keeps your models thin and provides a solid foundation for your application.\
+\
+:switch slide:\
+\
+Model tip #2 is an extension of tip #1. Only use nouns, avoids verbs. Your database stores user names and whether they receive email, if a post is published, and how much an order costs, but a database doesn\'92t know how to unsubscribe a user, send an email, publish a post, or calculate a total.\
+\
+:code model:\
+\
+Here\'92s an example user model.  First, notice how everything is organized. Every model in application should be organized the same way: I prefer, modules, enums, relationships, validations, callbacks, scopes, methods, with the database schema at the bottom.\
+\
+Everything is alphabetical, and all the models\'92 scopes are in one place .. not spread across a bunch of modules.  Multiline scopes call an external function and complicated properties use jobs to handle the dirty work.\
+\
+:switch slide:\
+\
+Job tip #1. Avoid nouns, use verbs. If models are you business data then jobs are your business logic. Unsubscribe a user, deliver a welcome email, publish a post, calculate a total.  That\'92s the heart of your application and each job clearly states what it\'92s accomplishing.\
+\
+And better yet, you get to say how it should run: now or in the background processor. If you this was just a verb in the model you wouldn\'92t know. \
+\
+:switch slide:\
+\
+Job tip #2. Break jobs into smaller jobs. 1,000 emails will send quicker if you send 10 at a time, but it also makes support easier.\
+\
+What happens if a 10-minute job is running when you restart sidekick?  \'85. sidekiq waits for a little while, but eventually kills it, and it has to start all over again. Exceptions have the same problem, any problem and they start over.\
+\
+:switch slide:\
+\
+Mailer tip #1. Never use deliver_now.  Mailers are essentially jobs and deliver_later is breaking a job down to its smallest piece. Can anyone answer the question? \'93Why is this code a support nightmare?\'94 \'85..\
+\
+When SMTP fails (and it will eventually fail) best case is you\'92re left not knowing who you already sent emails too.  Worst case, is sidekick retries the entire loop and people get hit with duplicate emails.\
+\
+deliver_now only creates headaches.\
+\
+:switch slide:\
+\
+Mailer tip #2.  Group mailer views under their own directory.  This is one of the first things I do on new projects, it just feels better and it\'92s really easy to do:\
+\
+:code mailer-3:\
+\
+It\'92s a single line in your ApplicationMailer and you\'92re set.\
+\
+:switch slide:\
+\
+View tip #1. Avoid most logic. Views should be really easy to follow and most logic just distracts from the HTML. Simple loops and if-statements are really all you need, everything else can get pulled into helpers.\
+\
+:switch slide:\
+\
+View tip #2. Break them into visual pieces. This isn\'92t Ruby, but I figure most are familiar with WordPress, and here I\'92ve broken a full page into its components. Topnav, sidebar, footer, screen options, help, recent activity, product news.\
+\
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
+\cf0 If you have trouble breaking your views into smaller pieces, you may want to rethink your design.\
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
+\cf0 \
+:code views-a:\
+\
+Here\'92s a sample layout. The actual WordPress HTML is more complicated, but you should get the idea: the layout defines out the different pieces come together to make the page.\
+\
+:code views-b: \
+\
+The action view does the same thing.  It defines out the header and the two widgets together. It relies on helpers to fill in the details of each piece\
+\
+:switch slide:\
+\
+Helper tip #1. Break helpers into view components. Topnav, Sidenav, footer, recent activity, product news all easily fit into view component objects, keeping any nasty logic out of your helpers and lets you take advantage of Object Oriented design benefits like easier re-use and property settings.\
+\
+:code helper-a:\
+\
+These are the helpers for the dashboard view. It does nothing but set up and render the view components.\
+\
+:code helper-b:\
+\
+The meat of each view component is nicely contained at the bottom but ultimately here it\'92s just an example. Take a look at the intelligent defaults which the helper method could override via the accessors, a render method exposing the HTML.\
+\
+:switch slide:\
+\
+Helper tip #2. Do not include all helpers. Years into a code base you\'92ll have lots of helpers, and if you\'92re not careful helpers will be referenced from all over the place. Making controllers explicitly declare what helpers they use makes you reconsider the scope of a helper and form the idea of a share library of helpers for your application.\
+\
+:switch slide:\
+\
+Phew, with all that said, here\'92s the final application architecture of one of my projects. We\'92ve added a few extra pieces to keep the basic Rails workflow as simple as possible.  Services pull logic out of controllers to keep them secure. View components handle the ugly details of each visual element in our app, and models are just a really nice layer on top of our database.\
+\
+:switch slide:\
+\
+Here\'92s my final suggestion. Rails doesn\'92t give you everything you need for an application to stay pretty as it grows over the years. Think about your Rails architecture.  Set its convention.  And never compromise.\
+\
+You may change your convention, but never compromise. I\'92ve seen the broken window theory in action too many times.\
+\
+:switch slide:\
+\
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
+\cf0 A mess breeds more mess, so keep your project feeling clean at every step. Think about the banzai tree and how much care it takes to keep it looking beautiful as it grows and put the same effort into your application.\
+\
+Thank you.\
+\
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
+\cf0 \
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+}

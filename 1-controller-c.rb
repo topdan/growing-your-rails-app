@@ -5,13 +5,13 @@ class SessionsController < ApplicationController
   def create
     @signin = Sessions::SignIn.new(session_params)
 
-    if @signin.locked_out?
-      flash[:alert] = t('sessions.create.locked_out')
-      redirect_to action: 'new'
-
-    elsif @signin.invalid_credentials?
+    if @signin.invalid_credentials?
       flash.now[:alert] = t('session.create.invalid_credentials')
       render 'new'
+
+    elsif @signin.locked_out?
+      flash[:alert] = t('sessions.create.locked_out')
+      redirect_to action: 'new'
 
     elsif @signin.needs_to_set_password?
       login(@signin.user)
